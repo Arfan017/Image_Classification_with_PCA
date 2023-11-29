@@ -19,8 +19,8 @@ def main_post():
     # new_size = (im2.size[0] * 0.2, im2.size[1] * 0.2)
     # img_size was set to (118, 179)
     # to be correct: (179.20000000000002, 118.4)
-    im1.thumbnail((179, 118))
-    im2.thumbnail((179, 118))
+    im1.thumbnail((48.0, 48.0))
+    im2.thumbnail((48.0, 48.0))
 
     # im1.show()
     # im1.save("./test.jpg")
@@ -45,6 +45,6 @@ def main_post():
     return render_template('index.html', score=int(euclid_dist))
 
 if __name__ == '__main__':
-    U = np.load('../principal-components.npy')
+    U = np.load('principal-components.npy')
 
     app.run(debug=True)
