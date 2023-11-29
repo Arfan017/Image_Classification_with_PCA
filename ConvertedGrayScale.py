@@ -91,4 +91,4 @@ def reshape_image_single(input_folder, output_folder, new_size):
         output_path = os.path.join(output_folder, image_name)
         img_resized.save(output_path)
 
-reshape_image_single('face_images', 'face_image_reshaped', (240, 240))
+reshape_image_single('Dataset_campur', 'Dataset_campur', (240, 240))

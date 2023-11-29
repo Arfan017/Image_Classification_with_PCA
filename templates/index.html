@@ -57,5 +57,15 @@
         {% if score or score==0 %}
             <h3>Similarity Score: {{ score }}</h3>
         {% endif %}
+
+        {% if uploaded_your_image_path %}
+        <h3>Your Face:</h3>
+        <img src=" {{ uploaded_your_image_path }}" alt="Your Face">
+        {% endif %}
+
+        {% if uploaded_other_image_path %}
+        <h3>Other Face:</h3>
+        <img src="{{ uploaded_other_image_path }}" alt="Another Face">
+        {% endif %}
     </body>
 </html>

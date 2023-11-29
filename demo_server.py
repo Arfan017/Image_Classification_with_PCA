@@ -1,4 +1,6 @@
+import os
 from flask import Flask, request, render_template
+from werkzeug.utils import secure_filename
 import numpy as np
 from PIL import Image
 
@@ -8,10 +10,20 @@ app = Flask(__name__)
 def main_get():
     return render_template('index.html')
 
+UPLOAD_FOLDER = 'upload_folder'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 @app.route('/', methods=['POST'])
 def main_post():
     file1 = request.files['your_face']
     file2 = request.files['other_face']
+
+    # Simpan gambar ke direktori upload
+    file1.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file1.filename)))
+    file2.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file2.filename)))
+
+    uploaded_your_image_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file1.filename))
+    uploaded_other_image_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file2.filename))
     
     im1 = Image.open(file1).convert('L')
     im2 = Image.open(file2).convert('L')
@@ -42,7 +54,8 @@ def main_post():
 
     euclid_dist = np.linalg.norm(im_diff)
 
-    return render_template('index.html', score=int(euclid_dist))
+    return render_template('index.html', score=int(euclid_dist), uploaded_your_image_path=uploaded_your_image_path, uploaded_other_image_path=uploaded_other_image_path
+                           )
 
 if __name__ == '__main__':
     U = np.load('principal-components.npy')
