@@ -10,20 +10,32 @@ app = Flask(__name__)
 def main_get():
     return render_template('index.html')
 
-UPLOAD_FOLDER = 'upload_folder'
+UPLOAD_FOLDER = os.path.join(os.getcwd(),'static/upload_image')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
 
 @app.route('/', methods=['POST'])
 def main_post():
+
     file1 = request.files['your_face']
     file2 = request.files['other_face']
+
+    if not file1 or not file2:
+        return render_template('index.html', error="Please upload both images.")
+
+    allowed_extensions = app.config['ALLOWED_EXTENSIONS']
+    if not (file1.filename.lower().endswith(tuple(allowed_extensions)) and file2.filename.lower().endswith(tuple(allowed_extensions))):
+            return render_template('index.html', error="Invalid file format. Please upload images in PNG, JPG, JPEG, or GIF format.")
 
     # Simpan gambar ke direktori upload
     file1.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file1.filename)))
     file2.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file2.filename)))
 
-    uploaded_your_image_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file1.filename))
-    uploaded_other_image_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file2.filename))
+    img1 = file1.filename
+    img2 = file2.filename
+
+    # uploaded_your_image_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file1.filename))
+    # uploaded_other_image_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file2.filename))
     
     im1 = Image.open(file1).convert('L')
     im2 = Image.open(file2).convert('L')
@@ -44,6 +56,7 @@ def main_post():
 
     im1_missing_pixels = [177 for i in range(U.shape[0] - im1_arr.shape[0])]
     im2_missing_pixels = [177 for i in range(U.shape[0] - im2_arr.shape[0])]
+    
     im1_arr = np.append(im1_arr, im1_missing_pixels)
     im2_arr = np.append(im2_arr, im2_missing_pixels)
     
@@ -54,7 +67,7 @@ def main_post():
 
     euclid_dist = np.linalg.norm(im_diff)
 
-    return render_template('index.html', score=int(euclid_dist), uploaded_your_image_path=uploaded_your_image_path, uploaded_other_image_path=uploaded_other_image_path
+    return render_template('index.html', score=int(euclid_dist), filename1=img1, filename2=img2
                            )
 
 if __name__ == '__main__':
